@@ -288,12 +288,12 @@ class MongoDBCollectionStream(Stream):
                         if operation_type not in operation_types_allowlist:
                             continue
                         cluster_time: datetime = record["clusterTime"].as_datetime()
-                        document = record["fullDocument"]
+                        document = record.get("fullDocument", record.get("documentKey", {}))
                         object_id: Optional[ObjectId] = document["_id"] if "_id" in document else None
                         parsed_record = {
                             "replication_key": record["_id"]["_data"],
                             "object_id": str(object_id) if object_id is not None else None,
-                            "document": record["fullDocument"],
+                            "document": document,
                             "operation_type": operation_type,
                             "cluster_time": cluster_time.isoformat(),
                             "namespace": {
